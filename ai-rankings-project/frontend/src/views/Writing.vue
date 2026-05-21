@@ -1937,7 +1937,7 @@ function aiGenerateChapterTitle(ch) {
   aiForm.sourceText = content;
   aiForm.expandAction = 'title';
   selectChapter(ch);
-  openAiPanel('character');
+  openAiPanel('title');
 }
 async function batchAutoTitleChapters() {
   const untitled = chapters.value.filter(c => !c.title || c.title.startsWith('第'));
@@ -1948,7 +1948,7 @@ async function generateTitle() {
   if (!draftContent.value.trim()) { showToast('请先输入章节内容'); return; }
   aiForm.sourceText = draftContent.value.slice(0, 500);
   aiForm.expandAction = 'title';
-  openAiPanel('character');
+  openAiPanel('title');
 }
 
 const { correctionRules, setCorrectionRules, resetCorrectionRules } = useCorrectionRules();
@@ -2202,7 +2202,8 @@ function openAiPanel(key) {
   ensureToolVariant(config);
   if (config.key === 'outline') loadCharactersForWriting();
   if (['expand', 'polish'].includes(config.mode)) {
-    const selectedText = refreshTextSelection();
+    // 章节起名始终使用正文内容，不使用划选
+	    const selectedText = config.key !== 'title' ? refreshTextSelection() : '';
     if (selectedText) {
       aiForm.sourceText = selectedText.slice(0, AI_SOURCE_LIMIT);
       setProcessingAnchor(textSelection.value);

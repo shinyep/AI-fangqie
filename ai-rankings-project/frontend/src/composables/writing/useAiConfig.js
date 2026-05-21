@@ -15,6 +15,16 @@ const aiFunctions = [
     ],
   },
   {
+    key: 'title',
+    label: '章节起名',
+    title: '章节起名',
+    description: '根据章节内容自动生成吸引读者的标题',
+    mode: 'expand',
+    sourceLabel: '章节内容',
+    defaultAction: 'title',
+    instruction: '你正在执行"章节起名"。根据章节正文内容，提炼出简洁有力、吸引读者的章节标题（15字以内），抓住本章核心爽点或钩子。只输出标题文本，不要任何解释或标记。',
+  },
+  {
     key: 'character',
     label: 'AI扩写润色',
     title: 'AI扩写润色',
@@ -171,6 +181,7 @@ export function useAiConfig() {
     const showTextProcessActions = computed(() => ['character', 'more'].includes(activeAiConfig.value.key));
     const requirementLabel = computed(() => {
       const labels = {
+        title: '起名要求',
         outline: '续写要求',
         review: '审稿要求',
         remove: '去痕要求',
