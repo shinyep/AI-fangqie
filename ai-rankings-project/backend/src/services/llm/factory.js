@@ -55,18 +55,38 @@ function loadProviderSecrets() {
   const db = getDb();
   try {
     const rows = db.prepare("SELECT * FROM ai_provider WHERE is_active = 1").all();
-    providerSecrets.clear();
+    const fresh = new Map();
     for (const row of rows) {
-      providerSecrets.set(row.provider, toProviderSecret(row));
+      fresh.set(row.provider, toProviderSecret(row));
     }
-  } catch {
-    // 表可能尚不存在
+    // 仅在查询成功后替换缓存，避免清空后查询失败导致缓存丢失
+    providerSecrets.clear();
+    for (const [k, v] of fresh) {
+      providerSecrets.set(k, v);
+    }
+  } catch (err) {
+    console.error('[LLM] 加载供应商密钥缓存失败:', err.message);
   }
 }
 
 function getProviderSecret(provider) {
   if (providerSecrets.size === 0) loadProviderSecrets();
-  return providerSecrets.get(provider);
+  const cached = providerSecrets.get(provider);
+  if (cached) return cached;
+
+  // 缓存未命中时直接查库（处理缓存被意外清空的情况）
+  try {
+    const db = getDb();
+    const row = db.prepare("SELECT * FROM ai_provider WHERE provider = ? AND is_active = 1").get(provider);
+    if (row) {
+      const secret = toProviderSecret(row);
+      providerSecrets.set(provider, secret);
+      return secret;
+    }
+  } catch (err) {
+    console.error(`[LLM] 直接查询供应商 ${provider} 密钥失败:`, err.message);
+  }
+  return undefined;
 }
 
 export function setProviderSecretCache(provider, secret) {
