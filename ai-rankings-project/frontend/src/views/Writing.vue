@@ -904,6 +904,10 @@
               <h2>{{ activeAiConfig.title }}</h2>
               <p>{{ activeAiConfig.description }}</p>
             </div>
+            <div v-if="activeAiConfig.key === 'title'" class="ct-panel-banner">
+              <van-icon name="flag-o" />
+              <span>输入章节内容，AI 自动提炼核心爽点生成标题</span>
+            </div>
             <button v-if="isCorrectionTool" class="plain-text-btn" @click="resetCorrectionRules">重置规则</button>
             <button title="关闭" @click="aiPanelOpen = false"><van-icon name="cross" /></button>
           </div>
@@ -4884,6 +4888,20 @@ onBeforeUnmount(() => {
   background: #fff;
   color: #16a05d;
   cursor: pointer;
+}
+
+/* 章节起名 - 面板顶部横幅 */
+.ct-panel-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 16px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fef3e2, #fff7e6);
+  border: 1px solid #f0d78c;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #b8730a;
 }
 
 /* 章节起名 - 标题结果卡片 */
