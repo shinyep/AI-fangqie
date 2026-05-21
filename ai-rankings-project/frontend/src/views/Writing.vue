@@ -1079,6 +1079,52 @@
 
 </template>
 
+          <!-- 章节起名 - 专用简洁表单 -->
+          <template v-else-if="activeAiConfig.key === 'title'">
+          <div class="ai-panel-body ct-title-body">
+
+            <div class="ct-source-card">
+              <div class="ct-source-head">
+                <van-icon name="notes-o" size="16" />
+                <span>章节内容</span>
+                <span class="ct-source-hint">自动提取前500字</span>
+              </div>
+              <pre class="ct-source-text">{{ aiForm.sourceText }}</pre>
+            </div>
+
+            <ModelSelector
+              v-model:provider="selectedProvider"
+              v-model:model="aiForm.model"
+            />
+
+            <label class="field">
+              <span>起名要求</span>
+              <textarea v-model="aiForm.customRequirement" rows="2" placeholder="例如：要霸气、制造悬念、抓住核心爽点..."></textarea>
+            </label>
+
+            <div v-if="aiForm.result" class="ai-result ct-result">
+              <div class="title-result-card">
+                <span class="title-result-label">AI 生成的章节标题</span>
+                <strong class="title-result-text">{{ aiForm.result }}</strong>
+                <div class="title-result-actions">
+                  <button class="title-apply-btn" @click="applyTitleToDraft">设为章节标题</button>
+                  <button class="title-copy-btn" @click="copyTitleResult">复制</button>
+                  <button class="title-retry-btn" @click="runAi"><van-icon name="replay" /> 重新生成</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="ai-panel-footer">
+            <span>以上内容均由AI生成，仅供参考和借鉴</span>
+            <button :disabled="aiLoading" @click="runAi">
+              <van-loading v-if="aiLoading" size="14" color="#fff" />
+              <van-icon v-else name="edit" />
+              {{ aiLoading ? '生成中' : '生成标题' }}
+            </button>
+          </div>
+        </template>
+
           <template v-else>
           <div class="ai-panel-body">
           <label class="switch-row">
@@ -1383,28 +1429,13 @@
             <textarea v-model="aiForm.customRequirement" class="short" placeholder="可选：输入本次 AI 处理的额外要求"></textarea>
           </label>
 
-          <div v-if="aiForm.result && (!isTextProcessMode || activeAiConfig.key === 'title')" class="ai-result">
-            <!-- 章节起名专用 -->
-            <template v-if="activeAiConfig.key === 'title'">
-              <div class="title-result-card">
-                <span class="title-result-label">AI 生成的章节标题</span>
-                <strong class="title-result-text">{{ aiForm.result }}</strong>
-                <div class="title-result-actions">
-                  <button class="title-apply-btn" @click="applyTitleToDraft">设为章节标题</button>
-                  <button class="title-copy-btn" @click="copyTitleResult">复制</button>
-                  <button class="title-retry-btn" @click="runAi"><van-icon name="replay" /> 重新生成</button>
-                </div>
-              </div>
-            </template>
-            <!-- 通用展示 -->
-            <template v-else>
-              <strong>生成结果</strong>
-              <p>{{ aiForm.result }}</p>
-              <div class="result-actions">
-                <button @click="applyAiResult('replace')">{{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}</button>
-                <button @click="applyAiResult('append')">追加到正文</button>
-              </div>
-            </template>
+          <div v-if="aiForm.result && !isTextProcessMode" class="ai-result">
+            <strong>生成结果</strong>
+            <p>{{ aiForm.result }}</p>
+            <div class="result-actions">
+              <button @click="applyAiResult('replace')">{{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}</button>
+              <button @click="applyAiResult('append')">追加到正文</button>
+            </div>
           </div>
 
           </div>
@@ -4902,6 +4933,57 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   font-size: 12px;
   color: #b8730a;
+}
+
+/* 章节起名 - 专用表单 */
+.ct-title-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ct-source-card {
+  margin: 0 16px;
+  background: #fafbfc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ct-source-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: #f0f4f8;
+  font-size: 13px;
+  font-weight: 500;
+  color: #444;
+}
+
+.ct-source-hint {
+  font-size: 11px;
+  color: #999;
+  margin-left: auto;
+}
+
+.ct-source-text {
+  margin: 0;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #555;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 140px;
+  overflow-y: auto;
+  font-family: inherit;
+}
+
+.ct-result {
+  margin: 0 16px 16px !important;
+  border: 1px solid #fef3e2 !important;
+  background: #fffdf7 !important;
 }
 
 /* 章节起名 - 标题结果卡片 */
