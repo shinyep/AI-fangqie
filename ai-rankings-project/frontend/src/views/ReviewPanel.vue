@@ -1,37 +1,49 @@
 <template>
   <div class="review-panel">
     <!-- 审稿类型选择 -->
-    <div class="review-tabs">
-      <button
-        v-for="v in variants"
-        :key="v.key"
-        :class="['review-tab', { active: activeVariant === v.key }]"
-        @click="activeVariant = v.key"
-      >
-        {{ v.label }}
-      </button>
+    <div class="review-section">
+      <div class="section-label">审稿类型</div>
+      <div class="review-tabs">
+        <button
+          v-for="v in variants"
+          :key="v.key"
+          :class="['review-tab', { active: activeVariant === v.key }]"
+          @click="activeVariant = v.key"
+        >
+          {{ v.label }}
+        </button>
+      </div>
     </div>
 
-    <!-- 操作按钮区 -->
-    <div class="review-actions">
+    <!-- 审稿操作 -->
+    <div class="review-section">
+      <div class="section-label">综合审稿</div>
       <van-button
         type="primary"
         size="small"
+        block
         :loading="reviewLoading"
         @click="runReview"
       >
         执行审稿
       </van-button>
-      <van-button
-        v-for="audit in auditTypes"
-        :key="audit.value"
-        plain
-        size="small"
-        :loading="auditLoading === audit.value"
-        @click="runAudit(audit.value)"
-      >
-        {{ audit.label }}
-      </van-button>
+    </div>
+
+    <!-- 专项审计 -->
+    <div class="review-section">
+      <div class="section-label">专项审计</div>
+      <div class="audit-actions">
+        <van-button
+          v-for="audit in auditTypes"
+          :key="audit.value"
+          plain
+          size="small"
+          :loading="auditLoading === audit.value"
+          @click="runAudit(audit.value)"
+        >
+          {{ audit.label }}
+        </van-button>
+      </div>
     </div>
 
     <!-- 加载状态 -->
@@ -294,34 +306,58 @@ async function runAudit(scope) {
   padding: 12px 0;
 }
 
+.review-section {
+  margin-bottom: 16px;
+}
+
+.section-label {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 8px;
+  padding-left: 2px;
+}
+
 .review-tabs {
   display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  flex-wrap: wrap;
+  gap: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e5e5;
 }
 
 .review-tab {
-  padding: 4px 12px;
-  border: 1px solid #ddd;
-  border-radius: 14px;
+  flex: 1;
+  padding: 7px 0;
+  border: none;
   background: #fff;
   font-size: 13px;
   color: #666;
   cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.review-tab + .review-tab {
+  border-left: 1px solid #e5e5e5;
+}
+
+.review-tab:hover {
+  background: #f7f8fa;
 }
 
 .review-tab.active {
   background: #1989fa;
-  border-color: #1989fa;
   color: #fff;
 }
 
-.review-actions {
+.audit-actions {
   display: flex;
   gap: 8px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
+}
+
+.audit-actions .van-button {
+  flex: 1;
 }
 
 .review-loading {
