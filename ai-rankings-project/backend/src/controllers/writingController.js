@@ -86,9 +86,9 @@ export async function expand(req, res) {
       logWriting('expand rejected: empty text', { requestId });
       return res.status(400).json({ code: 400, message: 'text is required' });
     }
-    if (!['expand', 'polish', 'shorten'].includes(action)) {
+    if (!['expand', 'polish', 'shorten', 'title'].includes(action)) {
       logWriting('expand rejected: invalid action', { requestId, action });
-      return res.status(400).json({ code: 400, message: 'action must be expand, polish or shorten' });
+      return res.status(400).json({ code: 400, message: 'action must be expand, polish, shorten or title' });
     }
     const result = await writingService.expandText({ text: text.trim(), action, style, promptContent, toolInstruction, requestId, provider, model });
     logWriting('expand response ready', {

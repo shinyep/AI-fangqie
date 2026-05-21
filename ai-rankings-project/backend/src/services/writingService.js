@@ -278,6 +278,11 @@ export async function expandText({ text, action = "expand", style = "", promptCo
       action_detail: "去除冗余描写，保留核心情节和关键对话，使表达更加简洁有力。字数压缩到原文的60-70%。",
       output_requirement: "精简表达，保留核心信息和情节",
     },
+    title: {
+      action_label: "起名要求",
+      action_detail: "根据章节内容，提炼出简洁有力、吸引读者的章节标题（15字以内），需要抓住本章核心爽点或钩子。",
+      output_requirement: "只输出章节标题，不输出任何其他内容",
+    },
   };
 
   const cfg = actionConfig[action] || actionConfig.expand;
@@ -288,7 +293,7 @@ export async function expandText({ text, action = "expand", style = "", promptCo
       .replace("{tool_instruction}", toolInstruction.trim())
       .replace("{text}", clippedText)
       .replace("{current_words}", String(text.length))
-    : EXPAND_TEXT_PROMPT.replace("{action}", action === "polish" ? "润色优化" : action === "shorten" ? "精简提炼" : "扩写丰富")
+    : EXPAND_TEXT_PROMPT.replace("{action}", action === "polish" ? "润色优化" : action === "shorten" ? "精简提炼" : action === "title" ? "章节起名" : "扩写丰富")
       .replace("{text}", clippedText)
       .replace("{current_words}", String(text.length))
       .replace("{action_label}", cfg.action_label)
@@ -320,7 +325,7 @@ export async function expandText({ text, action = "expand", style = "", promptCo
     timeoutMs: 180000,
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: hasToolInstruction ? "请根据当前工具和细分功能处理以上文本。" : `请对以上文本进行${action === "polish" ? "润色" : action === "shorten" ? "精炼" : "扩写"}处理。` },
+      { role: "user", content: hasToolInstruction ? "请根据当前工具和细分功能处理以上文本。" : `请对以上文本进行${action === "polish" ? "润色" : action === "shorten" ? "精炼" : action === "title" ? "章节起名" : "扩写"}处理。` },
     ],
   });
 

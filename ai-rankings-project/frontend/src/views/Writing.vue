@@ -1937,7 +1937,7 @@ function aiGenerateChapterTitle(ch) {
   aiForm.sourceText = content;
   aiForm.expandAction = 'title';
   selectChapter(ch);
-  openAiPanel('expand');
+  openAiPanel('character');
 }
 async function batchAutoTitleChapters() {
   const untitled = chapters.value.filter(c => !c.title || c.title.startsWith('第'));
@@ -1948,7 +1948,7 @@ async function generateTitle() {
   if (!draftContent.value.trim()) { showToast('请先输入章节内容'); return; }
   aiForm.sourceText = draftContent.value.slice(0, 500);
   aiForm.expandAction = 'title';
-  openAiPanel('expand');
+  openAiPanel('character');
 }
 
 const { correctionRules, setCorrectionRules, resetCorrectionRules } = useCorrectionRules();
@@ -2375,6 +2375,16 @@ async function runAi() {
 
     recordUsage(countChineseWords(aiForm.result));
     todayStats.value = getTodayStats();
+
+    // 章节起名：自动应用到标题并保存
+    if (aiForm.expandAction === 'title' && aiForm.result) {
+      draftTitle.value = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
+      aiForm.result = '';
+      showSuccessToast('标题已生成并保存');
+      saveCurrentChapter(false);
+      resetAiState();
+      return;
+    }
   } catch (error) {
     showFailToast('生成失败：' + error.message);
   } finally {
