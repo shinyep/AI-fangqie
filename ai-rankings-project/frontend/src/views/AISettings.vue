@@ -1,4 +1,4 @@
-<template>
+﻿<template>
   <main class="page">
     <header class="topbar">
       <div>
@@ -194,23 +194,45 @@
         />
         <p class="field-help">OpenAI 兼容端点，例如 https://api.deepseek.com/v1。Ollama 填 http://localhost:11434/v1。</p>
 
-        <!-- 获取模型列表（仅新增自定义厂商时） -->
-        <van-button
-          v-if="isCreating"
-          plain
-          block
-          :loading="previewing"
-          class="preview-btn"
-          @click="previewModels"
-        >
-          获取模型列表
-        </van-button>
-
         <!-- 模型管理（多模型） -->
         <div class="models-section">
           <div class="models-section-header">
             <span class="models-label">可用模型</span>
             <span class="models-count">{{ form.models.length }} 个</span>
+          </div>
+
+          <!-- 获取模型列表 -->
+          <van-button
+            v-if="isCreating"
+            plain
+            block
+            :loading="previewing"
+            size="small"
+            class="preview-btn"
+            @click="previewModels"
+          >
+            从API获取模型列表
+          </van-button>
+
+          <!-- 复选框选择模型 -->
+          <div v-if="selectableModels.length" class="model-checkbox-section">
+            <div class="checkbox-header">
+              <van-button size="mini" plain type="primary" @click="toggleAllSelectable(true)">全选</van-button>
+              <van-button size="mini" plain @click="toggleAllSelectable(false)">取消全选</van-button>
+              <span class="checkbox-hint">勾选需要显示的模型</span>
+            </div>
+            <div class="checkbox-grid">
+              <label
+                v-for="m in selectableModels"
+                :key="m"
+                class="checkbox-item"
+                :class="{ checked: modelCheckStates[m] }"
+                @click="toggleSelectableModel(m)"
+              >
+                <span class="checkbox-box">{{ modelCheckStates[m] ? '✓' : '' }}</span>
+                <span class="checkbox-label">{{ m }}</span>
+              </label>
+            </div>
           </div>
 
           <!-- 已选模型标签 -->
@@ -232,38 +254,12 @@
             <input
               v-model="newModelInput"
               class="add-model-input"
-              placeholder="输入模型名称后回车添加"
+              placeholder="手动输入模型名称后回车添加"
               @keydown.enter.prevent="addModel"
             />
             <van-button size="small" type="primary" :disabled="!newModelInput.trim()" @click="addModel">添加</van-button>
           </div>
-
-          <!-- 内置模型建议 -->
-          <div v-if="unselectedSuggestions.length" class="model-suggestions-wrap">
-            <span class="suggestions-label">内置可选：</span>
-            <div class="model-suggestions">
-              <span
-                v-for="m in unselectedSuggestions"
-                :key="m"
-                class="model-chip"
-                @click="addSuggestedModel(m)"
-              >{{ m }}</span>
-            </div>
-          </div>
-
-          <!-- 预览获取 -->
-          <van-button
-            v-if="isCreating"
-            plain
-            block
-            :loading="previewing"
-            class="preview-btn"
-            @click="previewModels"
-          >
-            从API获取模型列表
-          </van-button>
         </div>
-
         <!-- 并发/间隔 -->
         <div class="limit-row">
           <van-field
@@ -375,10 +371,14 @@ function addModel() {
   const name = newModelInput.value.trim();
   if (!name) return;
   if (form.models.includes(name)) {
-    showToast('模型已存在');
+    showToast('?????');
     return;
   }
   form.models.push(name);
+  // ????????????
+  if (selectableModels.value.includes(name)) {
+    modelCheckStates[name] = true;
+  }
   if (!form.model) form.model = name;
   newModelInput.value = '';
 }
@@ -386,6 +386,10 @@ function addModel() {
 function removeModel(idx) {
   const removed = form.models[idx];
   form.models.splice(idx, 1);
+  // ??????????
+  if (removed && selectableModels.value.includes(removed)) {
+    modelCheckStates[removed] = false;
+  }
   if (form.model === removed) {
     form.model = form.models[0] || '';
   }
@@ -398,17 +402,7 @@ function setDefaultModel(idx) {
   form.model = model;
 }
 
-function addSuggestedModel(name) {
-  if (form.models.includes(name)) return;
-  form.models.push(name);
-  if (!form.model) form.model = name;
-}
 
-// 内置模型建议（未在列表中的）
-const unselectedSuggestions = computed(() => {
-  if (isCreating.value) return [];
-  return selectableModels.value.filter(m => !form.models.includes(m));
-});
 
 // ========== 计算属性 ==========
 
@@ -509,6 +503,8 @@ function openEditDialog(p) {
   form.requestIntervalMs = p.requestIntervalMs || 0;
   form.reasoningEnabled = p.reasoningEnabled !== false;
   selectableModels.value = p.builtinModels || p.models || [];
+  // ??????????
+  syncCheckStatesFromModels();
   dialogVisible.value = true;
 }
 
@@ -556,6 +552,46 @@ async function submitDialog() {
   }
 }
 
+// 复选框状态
+const modelCheckStates = reactive({});
+
+const selectAllChecked = computed(() => {
+  if (!selectableModels.value.length) return false;
+  return selectableModels.value.every(m => modelCheckStates[m]);
+});
+
+function toggleSelectableModel(name) {
+  modelCheckStates[name] = !modelCheckStates[name];
+  syncCheckStatesToModels();
+}
+
+function toggleAllSelectable(checked) {
+  for (const m of selectableModels.value) {
+    modelCheckStates[m] = checked;
+  }
+  syncCheckStatesToModels();
+}
+
+function syncCheckStatesToModels() {
+  const selectableSet = new Set(selectableModels.value);
+  form.models = form.models.filter(m => !selectableSet.has(m));
+  for (const m of selectableModels.value) {
+    if (modelCheckStates[m]) {
+      form.models.push(m);
+    }
+  }
+  if (form.model && !form.models.includes(form.model)) {
+    form.model = form.models[0] || '';
+  }
+}
+
+function syncCheckStatesFromModels() {
+  const modelSet = new Set(form.models);
+  for (const m of selectableModels.value) {
+    modelCheckStates[m] = modelSet.has(m);
+  }
+}
+
 async function previewModels() {
   if (!form.baseURL.trim()) { showToast('请先输入API地址'); return; }
   previewing.value = true;
@@ -567,9 +603,12 @@ async function previewModels() {
     const fetched = data?.models || [];
     selectableModels.value = fetched;
     if (fetched.length > 0) {
-      form.models = [...fetched];
+      for (const m of fetched) {
+        modelCheckStates[m] = true;
+      }
+      form.models = [...new Set([...form.models.filter(m => !fetched.includes(m)), ...fetched])];
       if (!form.model) form.model = data.defaultModel || fetched[0];
-      showSuccessToast(`获取到 ${fetched.length} 个模型`);
+      showSuccessToast(`获取到 ${fetched.length} 个模型，默认已全选，可取消不需要的`);
     } else {
       showToast('未能获取模型列表，请检查API地址');
     }
@@ -1094,6 +1133,84 @@ async function doDelete(providerId) {
 
 .add-model-input:focus {
   border-color: var(--brand);
+}
+
+/* ??????? */
+.model-checkbox-section {
+  margin-top: 12px;
+  padding: 12px;
+  background: #fafbfc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.checkbox-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.checkbox-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 4px;
+}
+
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+  user-select: none;
+}
+
+.checkbox-item:hover {
+  background: #f0f2f5;
+}
+
+.checkbox-item.checked {
+  background: var(--brand-soft);
+}
+
+.checkbox-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  border-radius: 4px;
+  font-size: 12px;
+  color: #fff;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.checkbox-item.checked .checkbox-box {
+  background: var(--brand);
+  border-color: var(--brand);
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .model-suggestions-wrap {
