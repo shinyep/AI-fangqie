@@ -1379,7 +1379,7 @@
             <textarea v-model="aiForm.customRequirement" class="short" placeholder="可选：输入本次 AI 处理的额外要求"></textarea>
           </label>
 
-          <div v-if="aiForm.result && !isTextProcessMode" class="ai-result">
+          <div v-if="aiForm.result && (!isTextProcessMode || activeAiConfig.key === 'title')" class="ai-result">
             <!-- 章节起名专用 -->
             <template v-if="activeAiConfig.key === 'title'">
               <div class="title-result-card">
