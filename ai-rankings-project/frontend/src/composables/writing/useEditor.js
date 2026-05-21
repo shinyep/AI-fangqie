@@ -1,6 +1,26 @@
 import { computed, ref } from 'vue';
 import { countChineseWords } from '../../utils/usageStats.js';
 
+const INDENT = '　　';
+
+/** 确保每个非空段落以两个全角空格开头 */
+export function normalizeParagraphIndent(text) {
+  if (!text) return text;
+  const lines = text.split('\n');
+  let changed = false;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.length === 0) continue;
+    // 去掉行首已有的全角空格，统一重新添加两个
+    const stripped = line.replace(/^　+/, '');
+    if (stripped.length > 0) {
+      lines[i] = INDENT + stripped;
+      changed = true;
+    }
+  }
+  return changed ? lines.join('\n') : text;
+}
+
 export function useEditor() {
   const draftTitle = ref('');
   const draftContent = ref('');
@@ -9,7 +29,7 @@ export function useEditor() {
   const lastSavedAt = ref('');
   const contentInputRef = ref(null);
   const textSelection = ref({ start: 0, end: 0, text: '' });
-  const processingAnchor = ref(null); // { start, end, text } | null — 处理锚点，不受后续鼠标操作影响
+  const processingAnchor = ref(null);
 
   const draftWordCount = computed(() => countChineseWords(draftContent.value));
   const lastSavedText = computed(() => lastSavedAt.value || '尚未保存');
@@ -20,7 +40,7 @@ export function useEditor() {
 
   function setActiveChapter(chapter, formatDateTimeFn) {
     draftTitle.value = chapter?.title || '';
-    draftContent.value = chapter?.content || '';
+    draftContent.value = normalizeParagraphIndent(chapter?.content || '');
     dirty.value = false;
     lastSavedAt.value = chapter?.updated_at ? formatDateTimeFn(chapter.updated_at) : '';
   }
@@ -48,6 +68,25 @@ export function useEditor() {
     return hasActiveSelection.value ? textSelection.value.text : '';
   }
 
+  function handleEditorKeydown(event) {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    const textarea = event.target;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const insertion = '\n' + INDENT;
+    draftContent.value =
+      draftContent.value.slice(0, start) +
+      insertion +
+      draftContent.value.slice(end);
+    markDirty();
+    setTimeout(() => {
+      textarea.selectionStart = start + insertion.length;
+      textarea.selectionEnd = start + insertion.length;
+      syncTextSelection({ target: textarea });
+    }, 0);
+  }
+
   function setProcessingAnchor(sel) {
     processingAnchor.value = sel ? { start: sel.start, end: sel.end, text: sel.text } : null;
   }
@@ -70,6 +109,7 @@ export function useEditor() {
     setActiveChapter,
     markDirty,
     handleContentInput,
+    handleEditorKeydown,
     syncTextSelection,
     refreshTextSelection,
     processingAnchor,

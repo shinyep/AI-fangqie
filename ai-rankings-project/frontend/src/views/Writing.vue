@@ -187,6 +187,7 @@
               class="content-input"
               placeholder="请输入章节内容"
               @input="handleContentInput"
+              @keydown="handleEditorKeydown"
               @keyup="syncTextSelection"
               @mouseup="syncTextSelection"
               @select="syncTextSelection"
@@ -1697,7 +1698,7 @@ import { useCorrectionRules } from '../composables/writing/useCorrectionRules.js
 import { useAiConfig } from '../composables/writing/useAiConfig.js';
 import { useAiForm } from '../composables/writing/useAiForm.js';
 import { useInit } from '../composables/writing/useInit.js';
-import { useEditor } from '../composables/writing/useEditor.js';
+import { useEditor, normalizeParagraphIndent } from '../composables/writing/useEditor.js';
 import { useCharacterPicker } from '../composables/writing/useCharacterPicker.js';
 import { usePromptPicker } from '../composables/writing/usePromptPicker.js';
 import { useExtractStyle } from '../composables/writing/useExtractStyle.js';
@@ -1716,7 +1717,7 @@ const { selectedProvider, aiForm, ensureToolVariant, selectToolVariant } = useAi
 
 const { todayStats, stylePresets, requirementPresets, activeLibraryPrompt, displayStylePresets, displayRequirementPresets, createCurrentStyleProfile, createSelectedStylePresetContent, createSelectedRequirementPresetContent, createMergedStyleProfile, getPresetContent, getPresetPromptSection } = useInit();
 
-const { draftTitle, draftContent, dirty, saving, lastSavedAt, contentInputRef, textSelection, draftWordCount, lastSavedText, hasActiveSelection, setActiveChapter, markDirty, handleContentInput, syncTextSelection, refreshTextSelection, processingAnchor, setProcessingAnchor, clearProcessingAnchor } = useEditor();
+const { draftTitle, draftContent, dirty, saving, lastSavedAt, contentInputRef, textSelection, draftWordCount, lastSavedText, hasActiveSelection, setActiveChapter, markDirty, handleContentInput, handleEditorKeydown, syncTextSelection, refreshTextSelection, processingAnchor, setProcessingAnchor, clearProcessingAnchor } = useEditor();
 
 const { books, activeBook, bookKeyword, showNewBook, showBookSettings, bookOutlineDraft, bookStyleProfileDraft, creating, newBookTitle, newBookDesc, newBookStyle, newBookOutlineJobId, savedOutlineJobs, loadingOutlineJobs, filteredBooks, formatWords, formatRelativeTime, loadBookSettings, loadOutlineJobsForCreate, createBook, saveBookSettings } = useBookManagement(showToast, showSuccessToast, showFailToast);
 
@@ -1772,9 +1773,10 @@ function onStartRepair({ issues }) {
 async function onApplyRepair(repairedContent) {
   if (!activeChapter.value?.id || !repairedContent) return;
   repairLoading.value = true;
+  const normalized = normalizeParagraphIndent(repairedContent);
   try {
-    await updateChapter(activeChapter.value.id, { project_id: activeBook.value.id, content: repairedContent, word_count: repairedContent.length });
-    draftContent.value = repairedContent;
+    await updateChapter(activeChapter.value.id, { project_id: activeBook.value.id, content: normalized, word_count: normalized.length });
+    draftContent.value = normalized;
     if (activeBook.value?.id) {
       chapters.value = await fetchChapters(activeBook.value.id);
       const fresh = chapters.value.find(c => c.id === activeChapter.value.id);
@@ -2170,7 +2172,7 @@ async function saveCurrentChapter(showMessage = true) {
   const payload = {
     project_id: activeBook.value.id,
     title: draftTitle.value.trim() || `第${chapters.value.length + 1}章`,
-    content: draftContent.value,
+    content: normalizeParagraphIndent(draftContent.value),
     summary: activeChapter.value?.summary || '',
     word_count: draftWordCount.value,
     ai_model: aiForm.model,
@@ -2481,7 +2483,7 @@ function applyAiResult(mode) {
       showSuccessToast('已插入到光标位置');
     }
   } else {
-    draftContent.value = [draftContent.value.trim(), aiForm.result.trim()].filter(Boolean).join('\n\n');
+    draftContent.value = normalizeParagraphIndent([draftContent.value.trim(), aiForm.result.trim()].filter(Boolean).join('\n\n'));
     markDirty();
     showSuccessToast('已追加到正文');
   }
