@@ -18,13 +18,22 @@ export const useLlmStore = defineStore('llm', {
       return state.providers;
     },
 
-    // 当前选择的 provider+model 组合，默认取第一个活跃厂商
+    // 当前选择的 provider+model 组合，优先内置厂商
     defaultSelection(state) {
-      const active = state.providers.find(p => p.isActive && p.isConfigured);
-      if (active) {
+      // 优先从内置厂商中查找已激活且已配置的（避免自定义厂商抢夺默认位置）
+      const activeBuiltin = state.providers.find(p => p.isActive && p.isConfigured && p.isBuiltin);
+      if (activeBuiltin) {
         return {
-          provider: active.provider,
-          model: active.model || active.defaultModel || '',
+          provider: activeBuiltin.provider,
+          model: activeBuiltin.model || activeBuiltin.defaultModel || '',
+        };
+      }
+      // 其次从自定义厂商中查找
+      const activeCustom = state.providers.find(p => p.isActive && p.isConfigured);
+      if (activeCustom) {
+        return {
+          provider: activeCustom.provider,
+          model: activeCustom.model || activeCustom.defaultModel || '',
         };
       }
       // 回退到第一个厂商

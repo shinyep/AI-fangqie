@@ -2018,9 +2018,13 @@ async function init() {
   } catch {}
   try {
     await llmStore.refresh();  // 强制刷新，确保拿到 AI 设置中最新的模型配置
-    const def = llmStore.defaultSelection;
-    selectedProvider.value = def.provider;
-    aiForm.model = def.model;
+    // 仅当当前选择的供应商无效时才回退到默认值，避免每次加载都覆盖用户的选择
+    const currentValid = llmStore.activeProviders.some(p => p.provider === selectedProvider.value);
+    if (!currentValid) {
+      const def = llmStore.defaultSelection;
+      selectedProvider.value = def.provider;
+      aiForm.model = def.model;
+    }
   } catch {}
   // Fetch style presets from label system (dynamic)
   try {
