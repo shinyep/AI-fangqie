@@ -1380,12 +1380,27 @@
           </label>
 
           <div v-if="aiForm.result && !isTextProcessMode" class="ai-result">
-            <strong>生成结果</strong>
-            <p>{{ aiForm.result }}</p>
-            <div class="result-actions">
-              <button @click="applyAiResult('replace')">{{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}</button>
-              <button @click="applyAiResult('append')">追加到正文</button>
-            </div>
+            <!-- 章节起名专用 -->
+            <template v-if="activeAiConfig.key === 'title'">
+              <div class="title-result-card">
+                <span class="title-result-label">AI 生成的章节标题</span>
+                <strong class="title-result-text">{{ aiForm.result }}</strong>
+                <div class="title-result-actions">
+                  <button class="title-apply-btn" @click="applyTitleToDraft">设为章节标题</button>
+                  <button class="title-copy-btn" @click="copyTitleResult">复制</button>
+                  <button class="title-retry-btn" @click="runAi"><van-icon name="replay" /> 重新生成</button>
+                </div>
+              </div>
+            </template>
+            <!-- 通用展示 -->
+            <template v-else>
+              <strong>生成结果</strong>
+              <p>{{ aiForm.result }}</p>
+              <div class="result-actions">
+                <button @click="applyAiResult('replace')">{{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}</button>
+                <button @click="applyAiResult('append')">追加到正文</button>
+              </div>
+            </template>
           </div>
 
           </div>
@@ -2383,33 +2398,6 @@ async function runAi() {
 
     recordUsage(countChineseWords(aiForm.result));
     todayStats.value = getTodayStats();
-
-    // 章节起名：应用到标题并保存
-    if (aiForm.expandAction === 'title' && aiForm.result) {
-      const newTitle = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
-      // 已有标题时需要确认覆盖
-      if (draftTitle.value.trim()) {
-        try {
-          await showConfirmDialog({
-            title: '确认覆盖',
-            message: `当前标题"${draftTitle.value}"将被替换为"${newTitle}"，是否继续？`,
-            confirmButtonText: '覆盖',
-            cancelButtonText: '取消',
-          });
-        } catch {
-          // 用户取消
-          aiForm.result = '';
-          resetAiState();
-          return;
-        }
-      }
-      draftTitle.value = newTitle;
-      aiForm.result = '';
-      showSuccessToast('标题已生成并保存');
-      saveCurrentChapter(false);
-      resetAiState();
-      return;
-    }
   } catch (error) {
     showFailToast('生成失败：' + error.message);
   } finally {
@@ -2489,6 +2477,32 @@ function applyAiResult(mode) {
   }
   aiForm.result = '';
   saveCurrentChapter(false);
+}
+
+async function applyTitleToDraft() {
+  const newTitle = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
+  if (draftTitle.value.trim()) {
+    try {
+      await showConfirmDialog({
+        title: '确认覆盖',
+        message: `当前标题"${draftTitle.value}"将被替换为"${newTitle}"，是否继续？`,
+        confirmButtonText: '覆盖',
+        cancelButtonText: '取消',
+      });
+    } catch { return; }
+  }
+  draftTitle.value = newTitle;
+  aiForm.result = '';
+  showSuccessToast('标题已更新');
+  saveCurrentChapter(false);
+  resetAiState();
+}
+
+async function copyTitleResult() {
+  try {
+    await navigator.clipboard.writeText(aiForm.result);
+    showSuccessToast('已复制标题');
+  } catch { showToast('复制失败'); }
 }
 
 onMounted(() => {
@@ -4870,6 +4884,82 @@ onBeforeUnmount(() => {
   background: #fff;
   color: #16a05d;
   cursor: pointer;
+}
+
+/* 章节起名 - 标题结果卡片 */
+.title-result-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.title-result-label {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 1px;
+}
+
+.title-result-text {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  text-align: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #fef9f0, #fff7e6);
+  border: 2px dashed #e8d5a3;
+  border-radius: 10px;
+  min-width: 160px;
+}
+
+.title-result-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.title-apply-btn {
+  height: 32px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  background: #16a05d;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.title-copy-btn {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid #d0d5dd;
+  border-radius: 6px;
+  background: #fff;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.title-retry-btn {
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  background: none;
+  color: #999;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.title-retry-btn:hover {
+  color: #555;
 }
 
 .ai-panel-footer {
