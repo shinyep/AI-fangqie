@@ -2942,6 +2942,7 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  overflow: hidden;
   margin-top: 0;
   background: #fff;
   border-radius: 0 0 10px 10px;
@@ -2983,7 +2984,9 @@ onBeforeUnmount(() => {
 }
 
 .chapter-list {
+  flex: 1;
   overflow-y: auto;
+  min-height: 0;
   border-radius: 0 0 10px 10px;
 }
 
@@ -3034,13 +3037,14 @@ onBeforeUnmount(() => {
   justify-content: center;
   gap: 4px;
   min-height: 26px;
-  padding: 0 9px;
+  padding: 5px 9px;
   border: 1px solid #cfe2ff;
   border-radius: 4px;
   background: #e8f1ff;
   color: #1d4ed8;
   font-size: 12px;
-  line-height: 1;
+  line-height: 1.4;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -3116,6 +3120,7 @@ onBeforeUnmount(() => {
 
 .chapter-editor {
   min-width: 0;
+  overflow: hidden;
   padding-top: 0;
 }
 
@@ -3829,6 +3834,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   width: 480px;
   min-width: 420px;
+  overflow: hidden;
   background: #fff;
   border-left: 1px solid #e5e7eb;
   border-radius: 10px 0 0 10px;
