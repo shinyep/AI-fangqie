@@ -2411,6 +2411,7 @@ async function applyInlinePreview() {
   await nextTick();
   scrollToReplacedText();
   aiForm.result = '';
+  saveCurrentChapter(false);
 }
 function scrollToReplacedText() {
   const { start, end } = textSelection.value;
@@ -2451,6 +2452,8 @@ function applyAiResult(mode) {
     markDirty();
     showSuccessToast('已追加到正文');
   }
+  aiForm.result = '';
+  saveCurrentChapter(false);
 }
 
 onMounted(() => {
