@@ -1681,7 +1681,7 @@
 <script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { showSuccessToast, showToast, showFailToast } from 'vant';
+import { showSuccessToast, showToast, showFailToast, showConfirmDialog } from 'vant';
 import { fetchChapters, fetchProjects as fetchBooks, updateChapter, createChapter, deleteChapter } from '../api/books.js';
 import { fetchProviders } from '../api/aiSettings.js';
 import { useLlmStore } from '../stores/llmStore.js';
@@ -1987,7 +1987,8 @@ function formatDateTime(value) {
 }
 
 function chapterName(chapter) {
-  return chapter.title || `第${chapter.chapter_index || ''}章`;
+  const prefix = `第${chapter.chapter_index || ''}章`;
+  return chapter.title ? `${prefix} ${chapter.title}` : prefix;
 }
 
 function closeCharacterPicker(event) {
@@ -2377,9 +2378,26 @@ async function runAi() {
     recordUsage(countChineseWords(aiForm.result));
     todayStats.value = getTodayStats();
 
-    // 章节起名：自动应用到标题并保存
+    // 章节起名：应用到标题并保存
     if (aiForm.expandAction === 'title' && aiForm.result) {
-      draftTitle.value = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
+      const newTitle = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
+      // 已有标题时需要确认覆盖
+      if (draftTitle.value.trim()) {
+        try {
+          await showConfirmDialog({
+            title: '确认覆盖',
+            message: `当前标题"${draftTitle.value}"将被替换为"${newTitle}"，是否继续？`,
+            confirmButtonText: '覆盖',
+            cancelButtonText: '取消',
+          });
+        } catch {
+          // 用户取消
+          aiForm.result = '';
+          resetAiState();
+          return;
+        }
+      }
+      draftTitle.value = newTitle;
       aiForm.result = '';
       showSuccessToast('标题已生成并保存');
       saveCurrentChapter(false);
