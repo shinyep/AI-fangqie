@@ -1193,13 +1193,13 @@
           <label v-if="isTextProcessMode" class="field">
             <span>
               {{ activeAiConfig.sourceLabel || '处理文本' }}
-              <small>（优先使用正文中划选的段落，超过2500字不会发送给AI）</small>
+              <small>（优先使用正文中划选的段落，超过5000字不会发送给AI）</small>
               <b>*</b>
             </span>
             <div class="source-text-row">
               <textarea
                 v-model="aiForm.sourceText"
-                maxlength="2500"
+                maxlength="5000"
                 :placeholder="`划选正文段落后点击「获取选中」，或直接在这里输入要处理的文本`"
               ></textarea>
               <button
@@ -1211,7 +1211,7 @@
             </div>
             <em>
               <span v-if="processingAnchor" class="anchor-badge">已锚定位置 {{ processingAnchor.start }}-{{ processingAnchor.end }}（{{ processingAnchor.text.length }}字）</span>
-              {{ aiForm.sourceText.length }}/2500
+              {{ aiForm.sourceText.length }}/5000
             </em>
           </label>
 

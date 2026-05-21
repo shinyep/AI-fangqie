@@ -167,7 +167,7 @@ const textProcessActions = [
   { value: 'polish', label: '润色' },
   { value: 'shorten', label: '精炼' },
 ];
-const AI_SOURCE_LIMIT = 2500;
+const AI_SOURCE_LIMIT = 5000;
 
 export function useAiConfig() {
   function createActiveConfig(activeAiKeyRef, aiFormRef) {
