@@ -1,0 +1,5 @@
+{
+  "api_base": "https://c.xingyuexiezuo.com/api",
+  "token": "Bearer eyJ0eXAiOiJqd3QifQ.eyJzdWIiOiIxIiwiaXNzIjoiaHR0cDpcL1wvOiIsImV4cCI6MTc4MTE0NzgzMSwiaWF0IjoxNzc4NTU1ODMxLCJuYmYiOjE3Nzg1NTU4MzEsImhhc2giOiIiLCJ1aWQiOjY4NzI3OSwicyI6ImxJc0tncyIsImp0aSI6IjUxMDY5MDQzNTcyYWI2OTU3YTJiYmFkZDZjY2NkMjEzIn0.MzlmYTU1OWI5ZDQ0ZTNmNTNhYWZhZjdhNTU5ODI2OTU4NGEzMDE0Mw",
+  "expires_at": 1781147831
+}

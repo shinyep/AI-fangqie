@@ -1,0 +1,101 @@
+.chapter-editor {
+  min-width: 0;
+  padding-top: 0;
+}
+
+.editor-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 0 10px rgba(15, 23, 42, 0.06);
+}
+
+.inline-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 44px;
+  padding: 0 16px;
+  border-bottom: 1px solid #eef1f5;
+}
+
+.inline-toolbar button {
+  border: 0;
+  background: transparent;
+  color: #374151;
+  font-size: 18px;
+}
+
+.inline-toolbar i {
+  width: 1px;
+  height: 18px;
+  background: #e5e7eb;
+}
+
+.keyword-replace-btn {
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  color: var(--accent, #6366f1) !important;
+  font-size: 13px !important;
+  white-space: nowrap;
+}
+
+.keyword-replace-btn span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.title-line {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  height: 40px;
+  padding: 0 12px;
+  border-bottom: 1px solid #eef1f5;
+  color: #9ca3af;
+}
+
+.title-line input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 650;
+}
+
+.title-line input::placeholder,
+.content-input::placeholder {
+  color: #c4c8cf;
+}
+
+.title-line span {
+  color: #9ca3af;
+  font-size: 20px;
+}
+
+.content-input {
+  flex: 1;
+  width: 100%;
+  padding: 18px 12px 40px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  color: #111827;
+  font: inherit;
+  font-size: 20px;
+  line-height: 1.9;
+}
+
+.word-counter {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  color: #9ca3af;
+  font-size: 18px;
+}

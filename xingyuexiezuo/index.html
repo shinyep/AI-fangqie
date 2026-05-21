@@ -1,0 +1,209 @@
+﻿<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+
+<head>
+  <meta charset="UTF-8">
+  <meta content="0" http-equiv="Expires">
+  <meta content="no-cache" http-equiv="Pragma">
+  <meta content="no-cache" http-equiv="Cache-control">
+  <meta content="no-cache" http-equiv="Cache">
+  <link href="favicon.ico" rel="icon" type="image/svg+xml">
+  <meta content="yes" name="mobile-web-app-capable">
+  <meta
+    content="AIåå°è¯´, AIåä½, ç½æ, ç½ç»å°è¯´, çªèå°è¯´, èµ·ç¹å°è¯´, å§æ¬åä½è, AIå¢æå·¥å·, åä½è¾å©å·¥å·, ææåä½, deepseek, kimi, gemini, claude, æºè½åä½å©æ, å¨çº¿åä½å·¥å·, èªå¨çææç« , åæåä½, AIä½æå©æ, æç¤ºè¯"
+    name="keywords">
+  <meta content="ææåæ¯ä¸æ¬¾ä¸ä¸ºç½ç»å°è¯´ã å§æ¬åä½èæé çAIå¢æå·¥å·, ä½ä¸ºæ¨æä¾AIæºè½åä½è¾å©ï¼å¸®å©å¿«éçææç« ãè·ååæçµæï¼æååä½æçï¼æ¯ä¸æ¬¾åè½å¼ºå¤§çAIåä½å©æã" name="description">
+  <link href="favicon.ico" rel="apple-touch-icon">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover"
+    name="viewport" />
+  <title>ææåä½</title>
+  <script>
+    var _czc = _czc || [];
+    (function () {
+      var um = document.createElement("script");
+      um.src = "https://s4.cnzz.com/z.js?id=1281436462&async=1";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(um, s);
+    })();
+  </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function () {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?e51c319c1674341a307db5ba49ac561a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+  <script type="module" crossorigin src="assets/index-02699414.js"></script>
+  <link rel="stylesheet" href="assets/index-2efd0ebb.css">
+</head>
+
+<body class="dark:bg-black">
+  <div id="app">
+    <style>
+      body {
+        margin: auto;
+      }
+
+      #app {
+        background-image: linear-gradient(to right, #d7d2cc 0%, #304352 100%);
+      }
+
+      .loading-wrap {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        flex-wrap: wrap;
+      }
+
+      .logo {
+        width: auto;
+      }
+
+      .animated {
+        animation-duration: 1s;
+        animation-fill-mode: both
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0
+        }
+
+        100% {
+          opacity: 1
+        }
+      }
+
+      .fadeIn {
+        animation-name: fadeIn
+      }
+
+      #loader {
+        border-radius: 50%;
+        /* å°ååè®¾ç½®ä¸ºåå½¢ */
+        width: 30px;
+        /* è®¾ç½®ååçå®½åº¦ */
+        height: 30px;
+        /* è®¾ç½®ååçé«åº¦ */
+        animation: spin 2s linear infinite;
+        /* ä½¿ç¨å¨ç»ææè®©ååæè½¬ï¼æç»­æ¶é´ä¸º2ç§ï¼çº¿æ§è¿å¨ï¼æ éå¾ªç¯ */
+        background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAmdJREFUWEfV10nITmEUB/CfYiM22FOIKDKLDRbmDCUy7SgSxYIFCwsWLCgSxc4UKUPmBTZkFkWEYo8N2VB06nl1Xfe9z+v9vvo4devenjP8z/ic200XU7cutq+jAG4mB6a260hHAfxIhtvWkxMchsXY3sTDHICQO40XzSKUA3AQa3AEqyuU1AE4jFU4hLXtAojc3kjCM3C9pKgZgOm4lninoVErf+DIRSAEdmBrkhyA9wUtVQD6413i2YltdQXaCoCQv4sJOI8FGQDnMB/3MDHXHa0C6IOPSdlubEnv5Tbchc3prC8+dRaA0LMcxzJt10jJChzPGY/zYgRG4Cme4SgilG9KSiL833GxifK56J5kiyyDUupWIuyMTHZ+AzClolqj6sPYlQowOQfD6CwEqOiKIkV33SpHIL4HJuYQiKdnQeqXUM4yys58TS0cDsXztqGjrgh7YA5mYzDW1U20EqiYoAfwGpdxCd+qgLfaBS043R7LPw0gUhB5X4ihbabgJc6m4m4pBTFqw2jDcK9OKsIvBSAxvBqjOtuGt3EhjeBXf5nlIWkkz8PkVtpwDB7iOc40ucdjGn4o3HRlTHFj9quYgo29YhGGYyweVc2BOidjqERL1ck1RnG0bgyvLLXaBVELn5O2vdiU3suX0R5sTGe9EbmvpVYBnMBSPMD4gsaqfeA+xuEklnUGgFjJYjULGo0nGQCj8DjxxCoWK1lTykVgEqITgjZgf0lTs5VsPfYl3uiAO80Q5ABcRVR2bLZLKpTULaWn0kYdu+HMdgF0+Vqeq6Hcf0FO/v//Nct6mGPIFWFOvsPnPwG6anwhvIMbVwAAAABJRU5ErkJggg==");
+        /* å°PNGå¾çä½ä¸ºèæ¯ */
+        background-size: cover;
+        /* å°èæ¯ç¼©æ¾å°ä¸circleæ ·å¼ç¸å¹é */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+
+        /* åå§ç¶æï¼ååçè§åº¦ä¸º0åº¦ */
+        100% {
+          transform: rotate(360deg);
+        }
+
+        /* ç»æç¶æï¼ååçè§åº¦ä¸º360åº¦ï¼å³ä¸æ¬¡å®æ´çæè½¬ */
+      }
+    </style>
+    <div class="loading-wrap wow fadeIn animated"
+      style="visibility: visible; animation-delay: 350ms; animation-name: fadeIn; border-bottom:none;">
+
+      <h1 class="wow fadeIn animated" style="background: -webkit-linear-gradient(#F0F0F0,#EAEAEA);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    font-size: 2.5em;
+                    font-weight:700;
+                    line-height: 1.2;
+                    margin: 22px 0 0;">
+        ææåä½ï¼çµæéè¡
+      </h1>
+      <div id="loader" style="position: relative;bottom: -10%;display: none"></div> <!-- å è½½ååçå®¹å¨ -->
+
+
+    </div>
+    <div class="logo" style=" position:absolute;
+        bottom: 10%; /* ä½¿åç´ ä½äºç¶åç´ çåºé¨å¤é¢ */
+        left: 50%; /* ä½¿åç´ å¨å·¦å³æ¹åä¸ä½äºç¶åç´ çä¸­å¿ä½ç½® */
+        transform: translateX(-50%); /* å°åç´ èªèº«çä¸­å¿å®ä½å°ç¶åç´ çä¸­å¿ */">
+      <img alt="" src="assets/logo-62074c84.svg" style="max-width: 70vw;width: 350px;">
+    </div>
+  </div>
+  
+  <!--<script src="http://res.wx.qq.com/open/js/jweixin-1.6.0.js" type="text/javascript"></script>-->
+  <!-- è¾è®¯éªè¯ç JS SDKï¼å¿é¡»ï¼-->
+  <script src="https://turing.captcha.qcloud.com/TCaptcha.js"></script>
+  <link href='https://cdn.xingyuexiezuo.com/css/Yozai-Regular/result.css' media="print" onload="this.media='all';"
+    rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/sypxzs/result.css' media="print" onload="this.media='all';"
+    rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/CEFFontsCJK-Regular/result.css' media="print" onload="this.media='all';"
+    rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/SourceHanSerifCN/result.css' media="print" onload="this.media='all';"
+    rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/lxgwwenkaibright/result.css' media="print" onload="this.media='all';"
+    rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/AlibabaHealthFont20CN-45R/result.css' media="print"
+    onload="this.media='all';" rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/SmileySans-Oblique-2/result.css' media="print"
+    onload="this.media='all';" rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/AlimamaFangYuanTiVF-Thin/result.css' media="print"
+    onload="this.media='all';" rel='stylesheet' />
+  <link href='https://cdn.xingyuexiezuo.com/css/Kingnammm-Maiyuan-II-Regular-2/result.css' media="print"
+    onload="this.media='all';" rel='stylesheet' />
+
+  <script>
+    // è·åçªå£é«åº¦å¹¶å°å¶åºç¨äºå®¹å¨
+    document.getElementById('app').style.height = `${window.innerHeight}px`
+    // çå¬çªå£å¤§å°åå
+    window.onresize = function () {
+      document.getElementById('app').style.height = `${window.innerHeight}px`
+    }
+
+    setTimeout(() => {
+      // ä¸¤ç§åå¦æè¿å¨å è½½ï¼æ¾ç¤ºå è½½åå
+      if (document.getElementById('loader'))
+        document.getElementById('loader').style.display = 'block'
+    }, 2000)
+  </script>
+
+
+  <script>
+    // function isWeixinBrowser() {
+    //   let ua = navigator.userAgent.toLowerCase();
+    //   return ua.indexOf('micromessenger') !== -1;
+    // }
+    //
+    // function generateRandomState() {
+    //   return Math.random().toString(36).substring(2, 15); // çæä¸ä¸ªéæºç state
+    // }
+    //
+    // function getQueryParam(name) {
+    //   let reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    //   let r = window.location.search.substr(1).match(reg);
+    //   if (r != null) return decodeURIComponent(r[2]);
+    //   return null;
+    // }
+
+    // if (isWeixinBrowser()) {
+    //   let code = getQueryParam('code');
+    //   if (!code) {
+    //     state = generateRandomState();
+    //     sessionStorage.setItem("state", state); // å° state å­å¨å° sessionStorageï¼ä»¥é²æ­»å¾ªç¯
+    //     let redirectUri = encodeURIComponent(window.location.href);
+    //     let oauthUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc270921e5f4e37b7&redirect_uri=${redirectUri}&response_type=code&scope=snsapi_base&state=${state}&connect_redirect=1#wechat_redirect`;
+    //     window.location.replace(oauthUrl);
+    //   }
+    // }
+  </script>
+
+</body>
+
+</html>

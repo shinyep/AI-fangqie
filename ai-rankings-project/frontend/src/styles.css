@@ -1,0 +1,310 @@
+﻿:root {
+  --page-bg: #f5f6f8;
+  --surface: #fff;
+  --ink: #1a1d2e;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --brand: #4f46e5;
+  --brand-soft: #eef2ff;
+  --accent: #6366f1;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #10b981;
+  --sidebar-w: 180px;
+  --header-h: 56px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--page-bg);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ---- 侧边导航 ---- */
+.side-nav {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 20;
+  width: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  padding: 16px 10px;
+  box-shadow: 1px 0 8px rgba(0,0,0,0.03);
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  margin: 0 0 16px 6px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  box-shadow: 0 2px 8px rgba(79,70,229,0.25);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  border-radius: 8px;
+  padding: 0 10px;
+  color: #4b5563;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.nav-item:hover { background: #f3f4f6; }
+
+.nav-item.router-link-active {
+  color: var(--brand);
+  background: var(--brand-soft);
+  font-weight: 700;
+}
+
+.about-link {
+  margin-top: auto;
+  color: #9ca3af;
+  font-size: 13px;
+}
+
+/* ---- 主内容区 ---- */
+.app-main {
+  min-width: 0;
+  flex: 1;
+  margin-left: var(--sidebar-w);
+}
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  height: var(--header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(255,255,255,0.92);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(12px);
+}
+
+.app-header strong {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---- 页面通用 ---- */
+.page {
+  min-height: calc(100vh - var(--header-h));
+  padding: 24px 28px 40px;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  font-weight: 750;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.section { margin-top: 20px; }
+
+.section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+/* ---- 榜单类型栏 ---- */
+.rank-type-bar {
+  display: grid;
+  grid-template-columns: 260px 1fr auto;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.rank-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rank-tab {
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.rank-tab:hover { border-color: var(--brand); }
+
+.rank-tab.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand), var(--accent));
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.25);
+}
+
+/* ---- 分类条 ---- */
+.category-strip {
+  display: flex;
+  overflow-x: auto;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px;
+}
+
+.category-cell {
+  min-width: 88px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.category-cell:hover { background: #f3f4f6; }
+
+.category-cell.active {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  font-weight: 700;
+}
+
+.category-cell strong { display: block; font-size: 13px; }
+.category-cell span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+
+/* ---- 面板/卡片 ---- */
+.panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.book-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 12px;
+}
+
+.news-list,
+.inspiration-list {
+  display: grid;
+  gap: 10px;
+}
+
+/* ---- 指标卡片 ---- */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px 16px;
+  transition: box-shadow 0.15s;
+}
+
+.metric:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+.metric strong { display: block; font-size: 22px; font-weight: 700; }
+.metric span { color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+.empty {
+  color: var(--muted);
+  padding: 32px 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+/* ---- 响应式 ---- */
+@media (min-width: 1680px) {
+  .book-list { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  :root { --sidebar-w: 0px; }
+  .side-nav {
+    inset: auto 0 0;
+    width: auto;
+    height: 60px;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: auto;
+    padding: 4px 8px;
+    border-right: 0;
+    border-top: 1px solid var(--line);
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+  }
+  .avatar, .about-link { display: none; }
+  .nav-item {
+    flex: 0 0 auto;
+    min-width: 64px;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11px;
+  }
+  .app-main { margin-left: 0; }
+  .page { padding: 14px 14px 76px; }
+  .rank-type-bar { grid-template-columns: 1fr; }
+}
