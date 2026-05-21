@@ -247,6 +247,48 @@
   font-size: 12px;
 }
 
+.source-text-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.source-text-row textarea {
+  flex: 1;
+  min-height: 104px;
+}
+
+.grab-selection-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border: 1px solid #4f6ef6;
+  border-radius: 6px;
+  background: #f0f3ff;
+  color: #4f6ef6;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.grab-selection-btn:hover {
+  background: #e0e7ff;
+}
+
+.anchor-badge {
+  display: inline-block;
+  margin-right: 12px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #e6f7e6;
+  color: #2e7d32;
+  font-size: 11px;
+  vertical-align: middle;
+}
+
 .segmented {
   display: flex;
   gap: 8px;

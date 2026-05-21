@@ -862,7 +862,7 @@
               </div>
               <div class="ai-inline-preview-actions">
                 <button class="ai-inline-apply-btn" @click="applyInlinePreview">
-                  {{ hasActiveSelection ? '替换选中段落' : '替换正文' }}
+                  {{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}
                 </button>
                 <button class="ai-inline-dismiss-btn" @click="dismissInlinePreview">丢弃</button>
               </div>
@@ -1196,12 +1196,23 @@
               <small>（优先使用正文中划选的段落，超过2500字不会发送给AI）</small>
               <b>*</b>
             </span>
-            <textarea
-              v-model="aiForm.sourceText"
-              maxlength="2500"
-              :placeholder="`划选正文段落后点击 ${activeAiConfig.label}，或直接在这里输入要处理的文本`"
-            ></textarea>
-            <em>{{ aiForm.sourceText.length }}/2500</em>
+            <div class="source-text-row">
+              <textarea
+                v-model="aiForm.sourceText"
+                maxlength="2500"
+                :placeholder="`划选正文段落后点击「获取选中」，或直接在这里输入要处理的文本`"
+              ></textarea>
+              <button
+                type="button"
+                class="grab-selection-btn"
+                @click="grabEditorSelection"
+                title="将正文中划选的文本获取到此处"
+              ><van-icon name="down" /> 获取选中</button>
+            </div>
+            <em>
+              <span v-if="processingAnchor" class="anchor-badge">已锚定位置 {{ processingAnchor.start }}-{{ processingAnchor.end }}（{{ processingAnchor.text.length }}字）</span>
+              {{ aiForm.sourceText.length }}/2500
+            </em>
           </label>
 
           <label v-else class="field">
@@ -1371,7 +1382,7 @@
             <strong>生成结果</strong>
             <p>{{ aiForm.result }}</p>
             <div class="result-actions">
-              <button @click="applyAiResult('replace')">{{ hasActiveSelection ? '替换选中段落' : '替换正文' }}</button>
+              <button @click="applyAiResult('replace')">{{ processingAnchor ? '替换到原位置' : hasActiveSelection ? '替换选中段落' : '插入到光标' }}</button>
               <button @click="applyAiResult('append')">追加到正文</button>
             </div>
           </div>
@@ -1705,7 +1716,7 @@ const { selectedProvider, aiForm, ensureToolVariant, selectToolVariant } = useAi
 
 const { todayStats, stylePresets, requirementPresets, activeLibraryPrompt, displayStylePresets, displayRequirementPresets, createCurrentStyleProfile, createSelectedStylePresetContent, createSelectedRequirementPresetContent, createMergedStyleProfile, getPresetContent, getPresetPromptSection } = useInit();
 
-const { draftTitle, draftContent, dirty, saving, lastSavedAt, contentInputRef, textSelection, draftWordCount, lastSavedText, hasActiveSelection, setActiveChapter, markDirty, handleContentInput, syncTextSelection, refreshTextSelection } = useEditor();
+const { draftTitle, draftContent, dirty, saving, lastSavedAt, contentInputRef, textSelection, draftWordCount, lastSavedText, hasActiveSelection, setActiveChapter, markDirty, handleContentInput, syncTextSelection, refreshTextSelection, processingAnchor, setProcessingAnchor, clearProcessingAnchor } = useEditor();
 
 const { books, activeBook, bookKeyword, showNewBook, showBookSettings, bookOutlineDraft, bookStyleProfileDraft, creating, newBookTitle, newBookDesc, newBookStyle, newBookOutlineJobId, savedOutlineJobs, loadingOutlineJobs, filteredBooks, formatWords, formatRelativeTime, loadBookSettings, loadOutlineJobsForCreate, createBook, saveBookSettings } = useBookManagement(showToast, showSuccessToast, showFailToast);
 
@@ -2192,10 +2203,27 @@ function openAiPanel(key) {
   if (config.key === 'outline') loadCharactersForWriting();
   if (['expand', 'polish'].includes(config.mode)) {
     const selectedText = refreshTextSelection();
-    aiForm.sourceText = (selectedText || draftContent.value).trim().slice(0, AI_SOURCE_LIMIT);
+    if (selectedText) {
+      aiForm.sourceText = selectedText.slice(0, AI_SOURCE_LIMIT);
+      setProcessingAnchor(textSelection.value);
+    } else {
+      aiForm.sourceText = draftContent.value.trim().slice(0, AI_SOURCE_LIMIT);
+      clearProcessingAnchor();
+    }
     aiForm.expandAction = activeToolVariant.value?.action || config.defaultAction || 'expand';
   } else if (!aiForm.plot && draftTitle.value) {
     aiForm.plot = draftTitle.value;
+  }
+}
+
+function grabEditorSelection() {
+  const text = refreshTextSelection();
+  if (text) {
+    aiForm.sourceText = text.slice(0, AI_SOURCE_LIMIT);
+    setProcessingAnchor(textSelection.value);
+    showToast(`已获取 ${text.length} 字选中内容`);
+  } else {
+    showToast('请先在正文中划选文本');
   }
 }
 
@@ -2355,20 +2383,31 @@ async function runAi() {
 }
 
 function replaceSelectionWithAiResult() {
-  const { start, end } = textSelection.value;
+  const anchor = processingAnchor.value || textSelection.value;
+  const { start, end } = anchor;
   draftContent.value = draftContent.value.slice(0, start) + aiForm.result + draftContent.value.slice(end);
   textSelection.value = { start, end: start + aiForm.result.length, text: aiForm.result };
+  clearProcessingAnchor();
   markDirty();
 }
 
 async function applyInlinePreview() {
   if (!aiForm.result) return;
-  if (hasActiveSelection.value) {
+  const anchor = processingAnchor.value;
+  if (anchor && draftContent.value.slice(anchor.start, anchor.end) === anchor.text) {
     replaceSelectionWithAiResult();
+    showSuccessToast('已替换到原选中位置');
+  } else if (hasActiveSelection.value) {
+    replaceSelectionWithAiResult();
+    showSuccessToast('已替换当前选中段落');
   } else {
-    draftContent.value = aiForm.result;
+    const pos = textSelection.value.start;
+    draftContent.value = draftContent.value.slice(0, pos) + aiForm.result + draftContent.value.slice(pos);
+    textSelection.value = { start: pos, end: pos + aiForm.result.length, text: aiForm.result };
+    clearProcessingAnchor();
+    markDirty();
+    showSuccessToast('已插入到光标位置');
   }
-  showSuccessToast('???????');
   await nextTick();
   scrollToReplacedText();
   aiForm.result = '';
@@ -2392,17 +2431,26 @@ function scrollToReplacedText() {
 function applyAiResult(mode) {
   if (!aiForm.result) return;
   if (mode === 'replace') {
-    if (hasActiveSelection.value) {
+    const anchor = processingAnchor.value;
+    if (anchor && draftContent.value.slice(anchor.start, anchor.end) === anchor.text) {
       replaceSelectionWithAiResult();
+      showSuccessToast('已替换到原选中位置');
+    } else if (hasActiveSelection.value) {
+      replaceSelectionWithAiResult();
+      showSuccessToast('已替换当前选中段落');
     } else {
-      draftContent.value = aiForm.result;
+      const pos = textSelection.value.start;
+      draftContent.value = draftContent.value.slice(0, pos) + aiForm.result + draftContent.value.slice(pos);
+      textSelection.value = { start: pos, end: pos + aiForm.result.length, text: aiForm.result };
+      clearProcessingAnchor();
       markDirty();
+      showSuccessToast('已插入到光标位置');
     }
   } else {
     draftContent.value = [draftContent.value.trim(), aiForm.result.trim()].filter(Boolean).join('\n\n');
     markDirty();
+    showSuccessToast('已追加到正文');
   }
-  showSuccessToast(mode === 'replace' ? (hasActiveSelection.value ? '已替换选中段落' : '已替换正文') : '已追加到正文');
 }
 
 onMounted(() => {

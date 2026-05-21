@@ -9,6 +9,7 @@ export function useEditor() {
   const lastSavedAt = ref('');
   const contentInputRef = ref(null);
   const textSelection = ref({ start: 0, end: 0, text: '' });
+  const processingAnchor = ref(null); // { start, end, text } | null — 处理锚点，不受后续鼠标操作影响
 
   const draftWordCount = computed(() => countChineseWords(draftContent.value));
   const lastSavedText = computed(() => lastSavedAt.value || '尚未保存');
@@ -47,6 +48,14 @@ export function useEditor() {
     return hasActiveSelection.value ? textSelection.value.text : '';
   }
 
+  function setProcessingAnchor(sel) {
+    processingAnchor.value = sel ? { start: sel.start, end: sel.end, text: sel.text } : null;
+  }
+
+  function clearProcessingAnchor() {
+    processingAnchor.value = null;
+  }
+
   return {
     draftTitle,
     draftContent,
@@ -63,5 +72,8 @@ export function useEditor() {
     handleContentInput,
     syncTextSelection,
     refreshTextSelection,
+    processingAnchor,
+    setProcessingAnchor,
+    clearProcessingAnchor,
   };
 }
