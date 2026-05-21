@@ -26,6 +26,11 @@
           <strong>{{ activeTool.name }}</strong>
         </div>
 
+        <div v-if="activeTool?.key === 'chapter_title'" class="ct-form-tip">
+          <van-icon name="info-o" size="14" />
+          <span>输入章节正文内容（建议200-500字），AI 将提炼核心爽点，生成多个吸睛标题供你选择</span>
+        </div>
+
         <DynamicFormInput
           v-for="inp in visibleInputs"
           :key="inp.key"
@@ -286,19 +291,32 @@
           </div>
         </template>
 
-        <!-- 章节起名 -->
+        <!-- 章节起名 - 专用结果展示 -->
         <template v-else-if="activeTool?.key === 'chapter_title'">
-          <div v-for="(item, i) in output.data" :key="i" class="result-card">
-            <div class="card-head">
-              <strong>{{ item.title }}</strong>
-              <van-tag size="mini" type="primary" plain>{{ item.emotional_tone }}</van-tag>
-              <van-tag size="mini" plain>{{ item.style }}</van-tag>
+          <div class="ct-section">
+            <div v-for="(item, i) in output.data" :key="i" class="ct-card" :style="{ borderLeftColor: toneColor(item.emotional_tone) }">
+              <div class="ct-index" :style="{ color: toneColor(item.emotional_tone) }">{{ String(i + 1).padStart(2, '0') }}</div>
+              <div class="ct-body">
+                <div class="ct-title-row">
+                  <span class="ct-title-text">{{ item.title }}</span>
+                  <van-button size="mini" icon="copy-o" round plain hairline @click="copySingleTitle(item.title)" />
+                </div>
+                <div class="ct-badges">
+                  <span class="ct-badge ct-badge-tone" :style="toneBadgeStyle(item.emotional_tone)">{{ item.emotional_tone }}</span>
+                  <span class="ct-badge ct-badge-style">{{ item.style }}</span>
+                </div>
+                <p class="ct-reason">{{ item.reason }}</p>
+                <div v-if="item.keywords?.length" class="ct-kw-list">
+                  <span v-for="k in item.keywords" :key="k" class="ct-kw">#{{ k }}</span>
+                </div>
+                <div v-if="item.alternatives?.length" class="ct-alt-section">
+                  <span class="ct-alt-label">备选方案</span>
+                  <div class="ct-alt-list">
+                    <span v-for="alt in item.alternatives" :key="alt" class="ct-alt-chip" @click="copySingleTitle(alt)">{{ alt }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p>{{ item.reason }}</p>
-            <div v-if="item.keywords?.length" class="card-tags">
-              <van-tag v-for="k in item.keywords" :key="k" size="mini" plain>{{ k }}</van-tag>
-            </div>
-            <p v-if="item.alternatives?.length"><span class="tag-label">备选：</span>{{ item.alternatives.join(' · ') }}</p>
           </div>
         </template>
 
@@ -459,6 +477,35 @@ function toolIcon(key) {
     cover_prompt: 'photo-o', volume_summary: 'books-o',
   };
   return map[key] || 'star-o';
+}
+
+const toneColorMap = {
+  '热血': '#e74c3c',
+  '紧张': '#e67e22',
+  '轻松': '#27ae60',
+  '悲壮': '#8e44ad',
+  '悬疑': '#3498db',
+  '热血沸腾': '#e74c3c',
+  '温馨': '#27ae60',
+  '霸气': '#c0392b',
+};
+
+function toneColor(tone) {
+  return toneColorMap[tone] || '#667eea';
+}
+
+function toneBadgeStyle(tone) {
+  const color = toneColor(tone);
+  return { background: color + '18', color, borderColor: color + '30' };
+}
+
+async function copySingleTitle(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showSuccessToast('已复制：' + text);
+  } catch {
+    showToast('复制失败');
+  }
 }
 
 function selectTool(tool) {
@@ -725,12 +772,157 @@ onMounted(async () => {  try {    tools.value = await fetchToolList();
   word-break: break-word; color: var(--muted); max-height: 400px; overflow: auto;
 }
 
-.empty-state {
-  text-align: center;
-  padding: 40px 0;
-  color: var(--muted);
-  font-size: 14px;
+/* 章节起名 - 专用样式 */
+.ct-form-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 8px 10px;
+  background: #f0f4ff;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #5b7fdb;
+  line-height: 1.5;
+  margin-bottom: 4px;
 }
+.ct-form-tip .van-icon { flex-shrink: 0; margin-top: 1px; }
+
+.ct-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ct-card {
+  display: flex;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #ebedf0;
+  border-left: 4px solid #667eea;
+  border-radius: 10px;
+  padding: 14px 14px 14px 12px;
+  transition: box-shadow 0.15s;
+}
+.ct-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+
+.ct-index {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  font-family: 'Georgia', 'Times New Roman', serif;
+  min-width: 28px;
+  text-align: center;
+  opacity: 0.7;
+}
+
+.ct-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.ct-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.ct-title-text {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #1a1a1a;
+  line-height: 1.3;
+}
+
+.ct-badges {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.ct-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 500;
+}
+.ct-badge-tone {
+  border: 1px solid transparent;
+}
+
+.ct-badge-style {
+  background: #f5f5f5;
+  color: #888;
+}
+
+.ct-reason {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 6px;
+  line-height: 1.5;
+}
+
+.ct-kw-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.ct-kw {
+  font-size: 11px;
+  color: #999;
+  background: #fafafa;
+  padding: 1px 8px;
+  border-radius: 8px;
+}
+
+.ct-alt-section {
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.ct-alt-label {
+  font-size: 11px;
+  color: #aaa;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.ct-alt-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ct-alt-chip {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 12px;
+  color: #555;
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ct-alt-chip:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: #f0f4ff;
+}
+.ct-alt-chip:active {
+  background: #e0e8ff;
+  transform: scale(0.96);
+}
+
+
 
 /* 全局样式补充 */
 .section {
