@@ -1098,14 +1098,20 @@
               <textarea v-model="aiForm.customRequirement" rows="2" placeholder="例如：要霸气、制造悬念、抓住核心爽点..."></textarea>
             </label>
 
-            <div v-if="aiForm.result" class="ai-result ct-result">
+            <div class="ai-result ct-result">
               <div class="title-result-card">
-                <span class="title-result-label">AI 生成的章节标题</span>
-                <strong class="title-result-text">{{ aiForm.result }}</strong>
+                <span class="title-result-label">{{ aiForm.result ? 'AI 生成的章节标题（可修改）' : '手动输入章节标题' }}</span>
+                <input
+                  type="text"
+                  class="title-result-input"
+                  v-model="editableTitle"
+                  placeholder="输入或修改章节标题..."
+                  maxlength="35"
+                />
                 <div class="title-result-actions">
                   <button class="title-apply-btn" @click="applyTitleToDraft">设为章节标题</button>
-                  <button class="title-copy-btn" @click="copyTitleResult">复制</button>
-                  <button class="title-retry-btn" @click="runAi"><van-icon name="replay" /> 重新生成</button>
+                  <button v-if="editableTitle" class="title-copy-btn" @click="copyTitleResult">复制</button>
+                  <button v-if="aiForm.sourceText" class="title-retry-btn" @click="runAi"><van-icon name="replay" /> 重新生成</button>
                 </div>
               </div>
             </div>
@@ -1785,6 +1791,7 @@ const batchSelected = ref(new Set());
 const newFolderName = ref('');
 const importChapterText = ref('');
 const importChapterTitle = ref('');
+const editableTitle = ref('');
 const findKeyword = ref('');
 const findReplaceText = ref('');
 const findResults = ref([]);
@@ -2251,6 +2258,7 @@ function openAiPanel(key) {
   activeAiKey.value = key;
   aiPanelOpen.value = true;
   aiForm.result = '';
+  editableTitle.value = '';
   const config = activeAiConfig.value;
   ensureToolVariant(config);
   if (config.key === 'outline') loadCharactersForWriting();
@@ -2349,6 +2357,7 @@ async function runAi() {
   const toolInstruction = getToolInstruction(config);
   aiLoading.value = true;
   aiForm.result = '';
+  if (activeAiConfig.value?.key === 'title') editableTitle.value = '';
 
   try {
     let result;
@@ -2425,6 +2434,7 @@ async function runAi() {
     }
 
     aiForm.result = result.text || '';
+    editableTitle.value = aiForm.result;
     if (!aiForm.result) { showToast('AI 已处理完毕但返回空内容，请确认 API Key 已配置'); console.log('expandText result:', result); }
 
     recordUsage(countChineseWords(aiForm.result));
@@ -2511,7 +2521,9 @@ function applyAiResult(mode) {
 }
 
 async function applyTitleToDraft() {
-  const newTitle = aiForm.result.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
+  const inputTitle = editableTitle.value.trim();
+  if (!inputTitle) { showToast('请输入或生成标题'); return; }
+  const newTitle = inputTitle.replace(/^[\s「」《》""'']+|[\s「」《》""'']+$/g, '').slice(0, 35);
   if (draftTitle.value.trim()) {
     try {
       await showConfirmDialog({
@@ -2524,6 +2536,7 @@ async function applyTitleToDraft() {
   }
   draftTitle.value = newTitle;
   aiForm.result = '';
+  editableTitle.value = '';
   showSuccessToast('标题已更新');
   saveCurrentChapter(false);
   resetAiState();
@@ -2531,7 +2544,7 @@ async function applyTitleToDraft() {
 
 async function copyTitleResult() {
   try {
-    await navigator.clipboard.writeText(aiForm.result);
+    await navigator.clipboard.writeText(editableTitle.value);
     showSuccessToast('已复制标题');
   } catch { showToast('复制失败'); }
 }
@@ -4989,18 +5002,33 @@ onBeforeUnmount(() => {
   letter-spacing: 1px;
 }
 
-.title-result-text {
-  font-size: 22px;
-  font-weight: 700;
+.title-result-input {
+  width: 100%;
+  max-width: 320px;
+  font-size: 18px;
+  font-weight: 600;
   color: #1a1a1a;
   letter-spacing: 1px;
   line-height: 1.3;
   text-align: center;
-  padding: 12px 20px;
+  padding: 12px 16px;
   background: linear-gradient(135deg, #fef9f0, #fff7e6);
   border: 2px dashed #e8d5a3;
   border-radius: 10px;
-  min-width: 160px;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.title-result-input:focus {
+  border-color: #16a05d;
+  background: linear-gradient(135deg, #f6fef9, #f0fdf6);
+}
+
+.title-result-input::placeholder {
+  color: #bbb;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .title-result-actions {
