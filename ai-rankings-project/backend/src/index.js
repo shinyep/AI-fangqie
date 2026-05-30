@@ -10,7 +10,6 @@ import { encryptMiddleware } from './middleware/encrypt.js';
 import { initDb } from './models/database.js';
 import { initFontDecoder, refreshFontMapping } from './services/fontDecoder.js';
 import { seedPrompts, seedLocalRewritePrompts } from './services/promptService.js';
-import { seedWordCards } from './services/wordCardService.js';
 import routes from './routes/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,7 +37,6 @@ function syncRewritePrompts() {
 initDb();
 seedPrompts();
 seedLocalRewritePrompts();
-seedWordCards();
 
 // 初始化字体解码器（加载已有映射）
 initFontDecoder();

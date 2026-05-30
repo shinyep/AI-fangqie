@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/index.js",
     "seed": "node src/models/seed.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch-path=./src --watch-preserve-output src/index.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.0.0",

@@ -313,7 +313,7 @@ export function getAIConfig() {
   if (!active) {
     return {
       provider: "deepseek",
-      model: "deepseek-chat",
+      model: "deepseek-v4-flash",
       api_key: "",
       api_base: "https://api.deepseek.com/v1",
       temperature: 0.7,

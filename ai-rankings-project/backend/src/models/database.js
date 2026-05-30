@@ -245,7 +245,7 @@ function migrateDb(db) {
     CREATE TABLE IF NOT EXISTS ai_model_route (
       task_type TEXT PRIMARY KEY,
       provider TEXT NOT NULL DEFAULT 'deepseek',
-      model TEXT NOT NULL DEFAULT 'deepseek-chat',
+      model TEXT NOT NULL DEFAULT 'deepseek-v4-flash',
       temperature REAL DEFAULT 0.7,
       max_tokens INTEGER DEFAULT 4096,
       request_protocol TEXT DEFAULT 'auto',
@@ -280,7 +280,7 @@ function migrateDb(db) {
             oldRow.provider || 'deepseek',
             oldRow.provider || 'deepseek',
             oldRow.api_key || '',
-            oldRow.model || 'deepseek-chat',
+            oldRow.model || 'deepseek-v4-flash',
             oldRow.api_base || 'https://api.deepseek.com/v1',
             oldRow.provider === 'deepseek' ? 1 : 0,
           );

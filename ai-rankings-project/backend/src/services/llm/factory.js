@@ -21,7 +21,7 @@ import {
 } from "./capabilities.js";
 import { resolveModel } from "./modelRouter.js";
 
-const DEBUG_LOG_PATH = join(process.cwd(), "llm-debug.log");
+const DEBUG_LOG_PATH = join(process.cwd(), "logs", "llm-debug.log");
 
 function debugLog(message, meta = {}) {
   const line = `[${new Date().toISOString()}] ${message} ${JSON.stringify(meta)}\n`;

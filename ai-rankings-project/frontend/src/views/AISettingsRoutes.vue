@@ -31,7 +31,7 @@
             <van-field
               v-model="bulk.model"
               label="模型"
-              placeholder="deepseek-chat"
+              placeholder="deepseek-v4-flash"
               clearable
             />
           </div>
@@ -76,7 +76,7 @@
                 <van-field
                   v-model="getDraft(r.taskType).model"
                   label="模型"
-                  placeholder="deepseek-chat"
+                  placeholder="deepseek-v4-flash"
                   clearable
                   class="compact-field"
                 />

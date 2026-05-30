@@ -4,9 +4,8 @@ export const PROVIDERS = {
   deepseek: {
     name: "DeepSeek",
     baseURL: "https://api.deepseek.com/v1",
-    defaultModel: "deepseek-chat",
+    defaultModel: "deepseek-v4-flash",
     models: [
-      "deepseek-chat",
       "deepseek-v4-flash",
       "deepseek-v4-pro",
       "deepseek-coder",

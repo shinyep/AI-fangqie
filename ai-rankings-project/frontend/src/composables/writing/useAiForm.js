@@ -11,7 +11,7 @@ export function useAiForm(llmStore) {
 
   const aiForm = reactive({
     advanced: false,
-    model: 'deepseek-chat',
+    model: 'deepseek-v4-flash',
     plot: '',
     style: '玄幻',
     stylePreset: '',
@@ -38,7 +38,7 @@ export function useAiForm(llmStore) {
     if (models.length) return models;
     // 回退：优先用厂商配置的模型，其次用当前输入值
     const fallback = getProviderDefaultModel(selectedProvider.value) || aiForm.model;
-    return fallback ? [fallback] : ['deepseek-chat'];
+    return fallback ? [fallback] : ['deepseek-v4-flash'];
   });
 
   // 监听 provider 切换，优先使用厂商配置的默认模型

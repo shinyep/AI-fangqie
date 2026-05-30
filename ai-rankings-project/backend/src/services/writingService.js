@@ -4,7 +4,7 @@ import { buildContinueContext, buildGenerateContext } from "./contextService.js"
 import { appendFileSync } from "fs";
 import { join } from "path";
 
-const DEBUG_LOG_PATH = join(process.cwd(), "writing-debug.log");
+const DEBUG_LOG_PATH = join(process.cwd(), "logs", "writing-debug.log");
 
 function debugLog(message, meta = {}) {
   const line = `[${new Date().toISOString()}] ${message} ${JSON.stringify(meta)}\n`;

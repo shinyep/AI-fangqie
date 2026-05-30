@@ -20,7 +20,7 @@ export const TASK_TYPES = [
 const DEFAULT_ROUTES = {
   chapter_analysis: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.3,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -28,7 +28,7 @@ const DEFAULT_ROUTES = {
   },
   title_analysis: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.8,
     maxTokens: 8192,
     requestProtocol: "auto",
@@ -36,7 +36,7 @@ const DEFAULT_ROUTES = {
   },
   writing_generate: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.9,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -44,7 +44,7 @@ const DEFAULT_ROUTES = {
   },
   writing_continue: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.85,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -52,7 +52,7 @@ const DEFAULT_ROUTES = {
   },
   writing_expand: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.75,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -60,7 +60,7 @@ const DEFAULT_ROUTES = {
   },
   chapter_summary: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.45,
     maxTokens: 1200,
     requestProtocol: "auto",
@@ -68,7 +68,7 @@ const DEFAULT_ROUTES = {
   },
   chapter_review: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.1,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -76,7 +76,7 @@ const DEFAULT_ROUTES = {
   },
   chapter_repair: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.3,
     maxTokens: 8192,
     requestProtocol: "auto",
@@ -84,7 +84,7 @@ const DEFAULT_ROUTES = {
   },
   chapter_audit: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.1,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -92,7 +92,7 @@ const DEFAULT_ROUTES = {
   },
   writing_extract_style: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.3,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -100,7 +100,7 @@ const DEFAULT_ROUTES = {
   },
   default: {
     provider: "deepseek",
-    model: "deepseek-chat",
+    model: "deepseek-v4-flash",
     temperature: 0.7,
     maxTokens: 4096,
     requestProtocol: "auto",
@@ -213,7 +213,7 @@ export function upsertModelRouteConfig(taskType, data) {
   `).run(
     normalizedTaskType,
     provider,
-    data.model || "deepseek-chat",
+    data.model || "deepseek-v4-flash",
     data.temperature ?? 0.7,
     data.maxTokens ?? 4096,
     requestProtocol,

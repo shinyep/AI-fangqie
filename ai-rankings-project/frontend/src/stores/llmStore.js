@@ -44,7 +44,7 @@ export const useLlmStore = defineStore('llm', {
           model: first.model || first.defaultModel || '',
         };
       }
-      return { provider: 'deepseek', model: 'deepseek-chat' };
+      return { provider: 'deepseek', model: 'deepseek-v4-flash' };
     },
 
     // 获取某个厂商的模型列表
